@@ -1,7 +1,11 @@
+const fs = require('fs');
+
 class Compactor {
   constructor() {
     this.codeMap = {};
     this.tree = null;
+    this.compactedString = "";
+
   }
   compact(string) {
     this.lettersCount = {};
@@ -26,10 +30,13 @@ class Compactor {
       num2 = this.tree.pop();
       this.tree.push({value: num1.value + num2.value, left: num1, right: num2});
     }
-    /** TODO */
-    // remover retorno e botar pra salvar num arquivo tlgd
-    // escrever arvore
+    
     this._createCodeMap();
+    
+    for(const char of string) {
+      this.compactedString += this.codeMap[char];
+    }
+    fs.writeFile('compact', this.compactedString, (err) => {});
   }
   _createCodeMap() {
     this._fillCodeMap(this.codeMap, '', this.tree[0]);
@@ -42,9 +49,32 @@ class Compactor {
     this._fillCodeMap(letterCodeHash, steps + '0', tree.left);
     this._fillCodeMap(letterCodeHash, steps + '1', tree.right);
   }
-  discompact() {
 
+  discompact() {
+    let currentNode = this.tree[0];
+    let rawString = "";
+    
+    let i = 0;
+    
+    while(i <= this.compactedString.length){
+      if (currentNode.letter) {
+        rawString += currentNode.letter;
+        currentNode = this.tree[0];
+      }
+
+      if(this.compactedString[i++] == '0') {
+        currentNode = currentNode.left;
+      } else {
+        currentNode = currentNode.right;
+      }
+    }
+
+    fs.writeFile('output', rawString, (err) => {
+
+    });
+    
   }
+
 }
 
 module.exports = Compactor; 
