@@ -139,7 +139,7 @@ class Compactor {
       }
     }
 
-    fs.writeFile('output', rawString, (err) => {});
+    fs.writeFileSync('output', rawString);
     
   }
 

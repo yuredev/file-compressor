@@ -5,11 +5,11 @@ const Compactor = require('./Compactor');
 
 const compactor = new Compactor();
 
-console.log(fileContent);
+// console.log(fileContent);
 
 // compactor.compact(fileContent);
 
 // console.log(compactor.codeMap);
 // console.log(compactor.compactedString);
 
-// compactor.discompact('compact');
+compactor.discompact('compact');

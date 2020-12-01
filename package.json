@@ -2,7 +2,9 @@
   "name": "text-compactor",
   "version": "1.0.0",
   "scripts": {
-    "start": "node ./src/index.js"
+    "start": "node ./src/index.js",
+    "compress": "node ./src/compress.js",
+    "uncompress": "node ./src/uncompress.js"
   },
   "description": "text compactor using the Huffman algorithm",
   "main": "index.js",
