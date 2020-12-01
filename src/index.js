@@ -7,9 +7,9 @@ const compactor = new Compactor();
 
 console.log(fileContent);
 
-compactor.compact(fileContent);
+// compactor.compact(fileContent);
 
-console.log(compactor.codeMap);
-console.log(compactor.compactedString);
+// console.log(compactor.codeMap);
+// console.log(compactor.compactedString);
 
-compactor.discompact();
+// compactor.discompact('compact');
