@@ -1,63 +1,65 @@
+/**
+ * TO_DO: desfazer classe e tranformar seus métodos em funções
+ */
+
 const fs = require('fs');
 
 class Compactor {
-  constructor() {
-    this.codeMap = {};
-    this.tree = null;
-    this.compactedString = "";
-
-  }
-  compact(filePath){
-    const string = fs.readFileSync(filePath).toString();
-    this.lettersCount = {};
-    for (const char of string) {
-      if (this.lettersCount[char]) {
-        this.lettersCount[char]++;
+  /**
+   * Compacta um arquivo em outro menor
+   * @param {string} inputPath caminho para o arquivo que será lido 
+   * @param {string} outputPath caminho para salvar o arquivo comprimido
+   */
+  compact(inputPath, outputPath){
+    const fileContent = fs.readFileSync(inputPath).toString();
+    const charCounter = {};
+    for (const char of fileContent) {
+      if (charCounter[char]) {
+        charCounter[char]++;
       } else {
-        this.lettersCount[char] = 1;
+        charCounter[char] = 1;
       }
     }
-    const entries = Object.entries(this.lettersCount);
-    const sortedArray = entries.sort((e1, e2) => e2[1] - e1[1]);
-    this.tree = sortedArray.map(el => ({ 
+    const charRanking = Object.entries(charCounter).sort((e1, e2) => e2[1] - e1[1]);
+    let tree = charRanking.map(el => ({ 
       letter: el[0],
       value: el[1]
     }));
-    let num1, num2;
-    const size = this.tree.length;
-    for(let i = 0; i < size - 1; i++) {
-      this.tree.sort((a, b) => b.value - a.value);
-      num1 = this.tree.pop();
-      num2 = this.tree.pop();
-      this.tree.push({value: num1.value + num2.value, left: num1, right: num2});
+    const treeSize = tree.length;
+    for(let i = 0; i < treeSize - 1; i++) {
+      tree.sort((a, b) => b.value - a.value);
+      const node1 = tree.pop();
+      const node2 = tree.pop();
+      tree.push({
+        value: node1.value + node2.value, 
+        left: node1, 
+        right: node2
+      });
     }
+    tree = tree[0];
+    const codeMap = {};
+    this._createCodeMap(codeMap, tree);
     
-    this._createCodeMap();
-    
+    let encodedText = '';
     // criar string com o texto codificado
-    for(const char of string) {
-      this.compactedString += this.codeMap[char];
+    for(const char of fileContent) {
+      encodedText += codeMap[char];
     }
-    const hashEntries = Object.entries(this.codeMap);
-    // pegar hashMap que vai estar na primeira linha do arquivo
-    let hashToSave = hashEntries.reduce((acc, cur) => {
-      return acc + `${cur[0]}${cur[1]},`;
+    // juntar todo hashMap para salvar na primeira linha do arquivo
+    let fileHeader = Object.entries(codeMap).reduce((acc, cur, i, arr) => {
+      let result = acc + `${cur[0]}${cur[1]}`;
+      result += i < arr.length - 1 ? ',' : '';
+      return result;
     }, '');
-    // transformar em array para tirar vírgula do final usando o pop
-    hashToSave = hashToSave.split('');
-    // tirar vírcula do final
-    hashToSave.pop();
-    // colocar quebra de linha
-    hashToSave.push(process.platform === 'linux' ? '\n' : '\r\n');
-    // transformar array em strong novamente
-    hashToSave = hashToSave.join('');
-    // juntar primeira linha com o texto codificado
-    const textToSave = hashToSave + this.compactedString;
 
-    fs.writeFileSync('compact', textToSave);
+    fileHeader += process.platform === 'linux' ? '\n' : '\r\n';
+    // juntar primeira linha com o texto codificado
+    const textToSave = fileHeader + encodedText;
+
+    fs.writeFileSync(outputPath, textToSave);
   }
-  _createCodeMap() {
-    this._fillCodeMap(this.codeMap, '', this.tree[0]);
+  _createCodeMap(codeMap, tree) {
+    this._fillCodeMap(codeMap, '', tree);
   }
   _fillCodeMap(letterCodeHash, steps, tree) {
     if(tree.letter) {
@@ -112,37 +114,28 @@ class Compactor {
     });
     return hashMap;
   }
-  discompact(filePath) {
-
-    const fileContent = fs.readFileSync(filePath).toString();
-
-    const [ hashMapString, compactedString ] = fileContent.split(process.platform === 'linux' ? '\n' : '\r\n');
-    
+  discompact(inputPath, outputPath) {
+    const fileContent = fs.readFileSync(inputPath).toString();
+    const [ hashMapString, encodedText ] = fileContent.split(process.platform === 'linux' ? '\n' : '\r\n');
     const codeMap = this._mountHashMap(hashMapString);
     const tree = this._getTreeByEncodedText(codeMap);
     
-    // let currentNode = this.tree[0];
     let currentNode = tree;
     let rawString = '';
     
-    let i = 0;
-
-    while(i <= compactedString.length){
+    for(let i = 0; i <= encodedText.length; i++){
       if (currentNode.letter) {
         rawString += currentNode.letter;
         currentNode = tree;
       }
-      if(compactedString[i++] == '0') {
+      if(encodedText[i] == '0') {
         currentNode = currentNode.left;
       } else {
         currentNode = currentNode.right;
       }
     }
-
-    fs.writeFileSync('output', rawString);
-    
+    fs.writeFileSync(outputPath, rawString);
   }
-
 }
 
 module.exports = Compactor; 

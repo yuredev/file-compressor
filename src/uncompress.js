@@ -4,4 +4,4 @@ const Compactor = require('./Compactor');
 
 const compactor = new Compactor();
 
-compactor.compact(inputPath, outputPath);
+compactor.discompact(inputPath, outputPath);
