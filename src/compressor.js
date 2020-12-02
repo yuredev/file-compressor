@@ -76,6 +76,11 @@ function fillCodeMap(letterCodeHash, steps, tree) {
 }
 
 // <----- Daniel ----->
+/**
+ * Monta a arvore a partir do hashmap
+ * @param {object} codeMap
+ * @returns {object} a arvore montada 
+ */
 function getTreeByCodeMap(codeMap) {
   let tree;
   let cur = tree = {};
@@ -125,6 +130,7 @@ function uncompress(inputPath, outputPath) {
   const codeMap = mountHashMap(hashMapString);
   const tree = getTreeByCodeMap(codeMap);
   
+  // <--- Leonardo 2 ---->
   let currentNode = tree;
   let uncompressedText = '';
   
