@@ -6,7 +6,6 @@ const fs = require('fs');
  * @param {string} outputPath caminho para salvar o arquivo comprimido
  */
 function compress(inputPath, outputPath) {
-  // <------ Yure ------>
   const fileContent = fs.readFileSync(inputPath).toString();
   const charCounter = {};
   for (const char of fileContent) {
@@ -22,7 +21,6 @@ function compress(inputPath, outputPath) {
     value: el[1]
   }));
 
-  // <----- Antonio ----->
   const treeSize = tree.length;
   for(let i = 0; i < treeSize - 1; i++) {
     tree.sort((a, b) => b.value - a.value);
@@ -36,11 +34,9 @@ function compress(inputPath, outputPath) {
   }
   tree = tree[0];
 
-  // <------ Alyson ------>
   const codeMap = {};
   createCodeMap(codeMap, tree);
   
-  // <----- Yure ----->
   let encodedText = '';
   // criar string com o texto codificado
   for(const char of fileContent) {
@@ -60,12 +56,10 @@ function compress(inputPath, outputPath) {
   fs.writeFileSync(outputPath, textToSave);
 }
 
-// Alyson
 function createCodeMap(codeMap, tree) {
   fillCodeMap(codeMap, '', tree);
 }
 
-// Alyson
 function fillCodeMap(letterCodeHash, steps, tree) {
   if(tree.letter) {
     letterCodeHash[tree.letter] = steps;
@@ -75,7 +69,6 @@ function fillCodeMap(letterCodeHash, steps, tree) {
   fillCodeMap(letterCodeHash, steps + '1', tree.right);
 }
 
-// <----- Daniel ----->
 /**
  * Monta a arvore a partir do hashmap
  * @param {object} codeMap
@@ -111,7 +104,6 @@ function getTreeByCodeMap(codeMap) {
   return tree;
 }
 
-// <----- Daniel ----->
 function mountHashMap(hashMapString) {
   const codeMap = hashMapString.split(',');
   const hashMap = {};
@@ -123,14 +115,12 @@ function mountHashMap(hashMapString) {
 }
 
 function uncompress(inputPath, outputPath) {
-  // <---- Leonardo ----->
   const fileContent = fs.readFileSync(inputPath).toString();
   const [ hashMapString, encodedText ] = fileContent.split(process.platform === 'linux' ? '\n' : '\r\n');
   
   const codeMap = mountHashMap(hashMapString);
   const tree = getTreeByCodeMap(codeMap);
   
-  // <--- Leonardo 2 ---->
   let currentNode = tree;
   let uncompressedText = '';
   
